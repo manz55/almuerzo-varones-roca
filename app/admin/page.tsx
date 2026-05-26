@@ -15,27 +15,26 @@ interface Inscripcion {
   comprobante_url: string | null;
 }
 
+// SVG REDISEÑADO FIEL AL LOGO OFICIAL (Llama dorada arriba, Paloma plateada abajo)
 const LOGO_ROCA_ETERNA_SVG = `
-  <svg viewBox="0 0 400 400" width="60" height="60" style="margin: 0 auto; display: block;">
-    <path d="M200,60 C230,110 270,120 270,160 C270,210 220,230 200,230 C180,230 130,210 130,160 C130,120 170,110 200,60 Z" fill="url(#gradientGoldAdmin)" />
-    <path d="M200,90 C215,125 240,135 240,165 C240,200 210,215 200,215 C190,215 160,200 160,165 C160,135 185,125 200,90 Z" fill="#EAB308" opacity="0.8" />
-    <path d="M200,205 C240,205 310,140 310,200 C310,260 230,280 200,280 C170,280 90,260 90,200 C90,140 160,205 200,205 Z" fill="url(#gradientSilverAdmin)" stroke="#94A3B8" stroke-width="1" />
-    <path d="M200,205 C220,220 240,240 240,255 C240,270 215,280 200,280 C185,280 160,270 160,255 C160,240 180,205 200,205 Z" fill="url(#gradientSilverDarkAdmin)" />
+  <svg viewBox="0 0 400 400" width="75" height="75" style="margin: 0 auto; display: block;">
     <defs>
-      <linearGradient id="gradientGoldAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#F5A623" />
-        <stop offset="50%" stop-color="#FFD700" />
-        <stop offset="100%" stop-color="#B45309" />
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#EAB308" />
+        <stop offset="50%" stop-color="#FACC15" />
+        <stop offset="100%" stop-color="#CA8A04" />
       </linearGradient>
-      <linearGradient id="gradientSilverAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#E2E8F0" />
+      <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#F1F5F9" />
+        <stop offset="60%" stop-color="#CBD5E1" />
         <stop offset="100%" stop-color="#94A3B8" />
       </linearGradient>
-      <linearGradient id="gradientSilverDarkAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#CBD5E1" />
-        <stop offset="100%" stop-color="#64748B" />
-      </linearGradient>
     </defs>
+    <path d="M200,60 C225,100 255,115 255,145 C255,185 220,195 200,195 C180,195 145,185 145,145 C145,115 175,100 200,60 Z" fill="url(#goldGrad)" />
+    <path d="M200,85 C215,112 235,122 235,145 C235,172 215,180 200,180 C185,180 165,172 165,145 C165,122 185,112 200,85 Z" fill="#FEF08A" opacity="0.4" />
+    
+    <path d="M200,175 C235,175 295,130 295,180 C295,230 225,250 200,250 C175,250 105,230 105,180 C105,130 165,175 200,175 Z" fill="url(#silverGrad)" stroke="#64748B" stroke-width="1.5" />
+    <path d="M200,175 C215,190 235,210 235,225 C235,240 215,248 200,248 C185,248 165,240 165,225 C165,210 185,190 200,175 Z" fill="#94A3B8" opacity="0.3" />
   </svg>
 `;
 
@@ -52,14 +51,14 @@ export default function AdminPanel() {
   async function fetchInscripciones() {
     try {
       setCargando(true);
-      // Hacemos el select directo sin ordenamiento de base de datos para evitar conflictos
+      // Petición limpia sin ordenamiento en base de datos para evitar caídas de columna
       const { data, error } = await supabase
         .from('inscripciones')
         .select('*');
 
       if (error) throw error;
 
-      // Ordenamos aquí en el cliente por ID descendente (los más nuevos primero)
+      // Ordenamos localmente por ID descendente
       const datosOrdenados = data ? [...data].sort((a, b) => b.id - a.id) : [];
       setInscripciones(datosOrdenados);
     } catch (error: any) {
@@ -105,35 +104,36 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-[#070a13] text-slate-100 p-4 md:p-8 font-sans">
       
+      {/* SECCIÓN IMPRESIÓN */}
       {ticketParaImprimir && (
         <div className="hidden print:block print:fixed print:inset-0 print:bg-white print:text-black print:p-8 print:z-[99999]">
-          <div style={{ border: '2px dashed #000', padding: '30px', maxWidth: '400px', margin: '0 auto', borderRadius: '10px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <div style={{ marginBottom: '5px' }}>{LOGO_ROCA_ETERNA_SVG}</div>
-            <div style={{ borderBottom: '1px solid #eee', paddingBottom: '15px' }}>
-              <p style={{ margin: '0', fontSize: '11px', fontWeight: 'bold', color: '#666', letterSpacing: '1px' }}>ROCA ETERNA MINISTERIOS</p>
-              <h2 style={{ margin: '3px 0 0 0', fontSize: '18px', letterSpacing: '0.5px' }}>ALMUERZO DE VARONES</h2>
-              <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#888' }}>Comprobante Oficial de Registro</p>
+          <div style={{ border: '2px dashed #000', padding: '25px', maxWidth: '380px', margin: '0 auto', borderRadius: '12px', fontFamily: 'sans-serif', textAlign: 'center' }}>
+            <div style={{ marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: LOGO_ROCA_ETERNA_SVG }} />
+            <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '12px' }}>
+              <p style={{ margin: '0', fontSize: '12px', fontWeight: 'bold', color: '#444', letterSpacing: '1.5px' }}>ROCA ETERNA MINISTERIOS</p>
+              <h2 style={{ margin: '4px 0 0 0', fontSize: '20px', fontWeight: '900', letterSpacing: '0.5px' }}>ALMUERZO DE VARONES</h2>
+              <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#666' }}>Comprobante Oficial de Registro</p>
             </div>
-            <div style={{ fontSize: '32px', fontWeight: 'bold', margin: '20px 0', color: '#d97706' }}>
+            <div style={{ fontSize: '34px', fontWeight: '900', margin: '18px 0', color: '#b45309', fontFamily: 'monospace' }}>
               {formatTicket(ticketParaImprimir.id)}
             </div>
-            <div style={{ margin: '20px 0', fontSize: '14px', lineHeight: '1.8', textAlign: 'left' }}>
+            <div style={{ margin: '15px 0', fontSize: '14px', lineHeight: '1.7', textAlign: 'left', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>
               <strong>Responsable:</strong> {ticketParaImprimir.responsable}<br />
               <strong>Teléfono:</strong> {ticketParaImprimir.telefono}<br />
               <strong>Cupos apartados:</strong> {ticketParaImprimir.cupos}<br />
               {ticketParaImprimir.acompanantes ? <><strong>Acompañantes:</strong> {ticketParaImprimir.acompanantes}<br /></> : ''}
               <strong>Total:</strong> Q{ticketParaImprimir.total}.00<br />
-              <strong>Método de pago:</strong> Transferencia Bancaria<br />
-              <strong>Estado actual:</strong> {ticketParaImprimir.estado}
+              <strong>Estado:</strong> {ticketParaImprimir.estado}
             </div>
-            <div style={{ fontSize: '11px', color: '#666', marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+            <div style={{ fontSize: '10px', color: '#666', marginTop: '10px' }}>
               Generado el {new Date().toLocaleDateString()}<br />
-              Validación interna de tesorería del evento.
+              Control de Entrada • Iglesia Roca Eterna
             </div>
           </div>
         </div>
       )}
 
+      {/* DASHBOARD PRINCIPAL */}
       <div className="max-w-7xl mx-auto space-y-6 print:hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
           <div>
@@ -202,13 +202,9 @@ export default function AdminPanel() {
                         </span>
                       </td>
                       <td className="p-4 text-right pr-6 space-x-2 whitespace-nowrap">
-                        {item.comprobante_url ? (
-                          <button onClick={() => manejarImpresion(item)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg font-bold text-[11px] transition-all">
-                            🖨️ PDF
-                          </button>
-                        ) : (
-                          <span className="text-[11px] text-slate-600 font-bold px-2 inline-block">—</span>
-                        )}
+                        <button onClick={() => manejarImpresion(item)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg font-bold text-[11px] transition-all">
+                          🖨️ PDF
+                        </button>
                         
                         {item.estado !== 'Pagado' ? (
                           <button onClick={() => cambiarEstado(item.id, 'Pagado')} className="bg-emerald-500 hover:bg-emerald-400 text-black px-2.5 py-1.5 rounded-lg font-black text-[11px] transition-all">
