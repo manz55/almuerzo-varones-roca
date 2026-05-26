@@ -52,13 +52,16 @@ export default function AdminPanel() {
   async function fetchInscripciones() {
     try {
       setCargando(true);
+      // Hacemos el select directo sin ordenamiento de base de datos para evitar conflictos
       const { data, error } = await supabase
         .from('inscripciones')
-        .select('*')
-        .order('id', { ascending: false });
+        .select('*');
 
       if (error) throw error;
-      setInscripciones(data || []);
+
+      // Ordenamos aquí en el cliente por ID descendente (los más nuevos primero)
+      const datosOrdenados = data ? [...data].sort((a, b) => b.id - a.id) : [];
+      setInscripciones(datosOrdenados);
     } catch (error: any) {
       alert('Error cargando inscripciones: ' + error.message);
     } finally {
@@ -80,7 +83,6 @@ export default function AdminPanel() {
     }
   }
 
-  // Función para formatear el ID como correlativo oficial (#VAR-001)
   const formatTicket = (id: number) => `#VAR-${String(id).padStart(3, '0')}`;
 
   const inscripcionesFiltradas = inscripciones.filter((item) => {
@@ -103,11 +105,10 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-[#070a13] text-slate-100 p-4 md:p-8 font-sans">
       
-      {/* SECCIÓN DE IMPRESIÓN (RECIBO ADMINISTRATIVO CON TICKET CORRELATIVO) */}
       {ticketParaImprimir && (
         <div className="hidden print:block print:fixed print:inset-0 print:bg-white print:text-black print:p-8 print:z-[99999]">
           <div style={{ border: '2px dashed #000', padding: '30px', maxWidth: '400px', margin: '0 auto', borderRadius: '10px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <div style={{ marginBottom: '5px' }}>${LOGO_ROCA_ETERNA_SVG}</div>
+            <div style={{ marginBottom: '5px' }}>{LOGO_ROCA_ETERNA_SVG}</div>
             <div style={{ borderBottom: '1px solid #eee', paddingBottom: '15px' }}>
               <p style={{ margin: '0', fontSize: '11px', fontWeight: 'bold', color: '#666', letterSpacing: '1px' }}>ROCA ETERNA MINISTERIOS</p>
               <h2 style={{ margin: '3px 0 0 0', fontSize: '18px', letterSpacing: '0.5px' }}>ALMUERZO DE VARONES</h2>
@@ -133,7 +134,6 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {/* CONTENIDO PRINCIPAL DEL DASHBOARD */}
       <div className="max-w-7xl mx-auto space-y-6 print:hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
           <div>
@@ -179,7 +179,6 @@ export default function AdminPanel() {
                 <tbody className="divide-y divide-slate-800/60 text-xs">
                   {inscripcionesFiltradas.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-900/40 transition-colors">
-                      {/* Mostramos el ticket con formato correlativo en base a su ID */}
                       <td className="p-4 pl-6 font-mono font-black text-amber-500">{formatTicket(item.id)}</td>
                       <td className="p-4 font-bold text-slate-200">
                         {item.responsable}
