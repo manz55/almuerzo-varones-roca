@@ -1,7 +1,9 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export', // Esto le dice a Next.js que genere archivos estáticos compatibles con Netlify
+  images: {
+    unoptimized: true, // Importante para que no falle al subir fotos
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig
